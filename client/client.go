@@ -41,7 +41,7 @@ func handleConnection(conn net.Conn, wait bool) {
 			// So we need to request from server
 
 			fmt.Println("Either enter a formula or type 'history' to see past results: ")
-			fmt.Println("Legal operations '+','-','*','/' and '^'")
+			fmt.Println("Legal operations '+','-','*','/','^' '()'")
 			reader := bufio.NewReader(os.Stdin)
 			calc, _ := reader.ReadString('\n')
 
