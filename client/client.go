@@ -93,7 +93,6 @@ func handleConnection(conn net.Conn, wait bool) {
 					fmt.Println("The result: ")
 					fmt.Println(res.Result)
 					fmt.Println("")
-
 				}
 
 				return
