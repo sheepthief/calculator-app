@@ -29,6 +29,9 @@ type Message struct {
 var messages []Message
 var WaitingForRespond bool
 
+var Full_addr_server string
+var Full_addr string
+
 func handleConnection(conn net.Conn, wait bool) {
 	defer conn.Close()
 	decoder := json.NewDecoder(conn)
@@ -41,7 +44,7 @@ func handleConnection(conn net.Conn, wait bool) {
 			// So we need to request from server
 
 			fmt.Println("Either enter a formula or type 'history' to see past results: ")
-			fmt.Println("Legal operations '+','-','*','/' and '^'")
+			fmt.Println("Legal operations '+','-','*','/', '^' and '()'")
 			reader := bufio.NewReader(os.Stdin)
 			calc, _ := reader.ReadString('\n')
 
@@ -102,13 +105,8 @@ func handleConnection(conn net.Conn, wait bool) {
 
 func sendMessage(message Message) {
 	fmt.Println("We send the message")
-	name, _ := os.Hostname()
-	ip_address_list, _ := net.LookupHost(name)
-	ip_address := ip_address_list[len(ip_address_list)-1]
 
-	full_addr := ip_address + ":" + strconv.Itoa(8080)
-
-	conn, _ := net.Dial("tcp", full_addr)
+	conn, _ := net.Dial("tcp", Full_addr_server)
 	encoder := json.NewEncoder(conn)
 	encoder.Encode(message)
 
@@ -120,13 +118,13 @@ func main() {
 	ip_address_list, _ := net.LookupHost(name)
 	ip_address := ip_address_list[len(ip_address_list)-1]
 
-	full_addr_server := ip_address + ":" + strconv.Itoa(8080)
-	full_addr := ip_address + ":" + strconv.Itoa(8081)
+	Full_addr_server = ip_address + ":" + strconv.Itoa(8080)
+	Full_addr = ip_address + ":" + strconv.Itoa(8081)
 
 	fmt.Println("Full Address: ")
-	fmt.Println(full_addr)
+	fmt.Println(Full_addr)
 
-	listen, err := net.Listen("tcp", full_addr) // starts listening on port
+	listen, err := net.Listen("tcp", Full_addr) // starts listening on port
 	if err != nil {
 		fmt.Println("Error in listen: ")
 		fmt.Println(err)
@@ -136,7 +134,7 @@ func main() {
 
 	for {
 
-		_, err := net.Dial("tcp", full_addr_server)
+		_, err := net.Dial("tcp", Full_addr_server)
 		if err == nil {
 			conn, err := listen.Accept()
 			if err != nil {

@@ -23,6 +23,9 @@ type Message struct {
 
 var messages []Message
 
+var Full_addr_client string
+var Full_addr string
+
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
 	decoder := json.NewDecoder(conn)
@@ -65,13 +68,8 @@ func handleConnection(conn net.Conn) {
 func sendMessage(message Message) {
 	fmt.Println(" We send the message")
 	fmt.Println(message)
-	name, _ := os.Hostname()
-	ip_address_list, _ := net.LookupHost(name)
-	ip_address := ip_address_list[len(ip_address_list)-1]
 
-	full_addr := ip_address + ":" + strconv.Itoa(8081)
-
-	conn, _ := net.Dial("tcp", full_addr)
+	conn, _ := net.Dial("tcp", Full_addr_client)
 	encoder := json.NewEncoder(conn)
 	encoder.Encode(message)
 
@@ -79,17 +77,14 @@ func sendMessage(message Message) {
 
 func main() {
 	fmt.Println("Server is alive")
-	name, _ := os.Hostname()
-	ip_address_list, _ := net.LookupHost(name)
+	Name, _ := os.Hostname()
+	ip_address_list, _ := net.LookupHost(Name)
 	ip_address := ip_address_list[len(ip_address_list)-1]
 
-	full_addr := ip_address + ":" + strconv.Itoa(8080)
-	full_addr_client := ip_address + ":" + strconv.Itoa(8081)
+	Full_addr = ip_address + ":" + strconv.Itoa(8080)
+	Full_addr_client = ip_address + ":" + strconv.Itoa(8081)
 
-	fmt.Println("Full Address: ")
-	fmt.Println(full_addr)
-
-	listen, err := net.Listen("tcp", full_addr) // starts listening on port
+	listen, err := net.Listen("tcp", Full_addr) // starts listening on port
 	if err != nil {
 		fmt.Println("Error in listen: ")
 		fmt.Println(err)
@@ -98,7 +93,7 @@ func main() {
 
 	for {
 
-		_, err := net.Dial("tcp", full_addr_client)
+		_, err := net.Dial("tcp", Full_addr_client)
 		if err == nil {
 			conn, err := listen.Accept()
 			if err != nil {
